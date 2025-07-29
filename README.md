@@ -68,17 +68,16 @@ In the compose.yaml itself, at a minimum we'd expect to see the follow for the d
 dev-container:
     container_name: #dev container name
     image: # dev container image
-    ports:    
-      - "9000:22" # Map 9000 on the host to internal ssh 22
+    ports:
+      # Map 9000 on the host to internal ssh 22
+      - "9000:22" 
     extra_hosts:
-      - "host.docker.internal:host.gateway" # If you want the container to access other services on your machine  
-      																			# (like ollama if running on the host)
+      # If you want the container to access other services on your machine (like ollama if running on the host)
+      - "host.docker.internal:host.gateway" 
     volumes:
-      - home-dir:/home:rw # mount the named volume with the home directory inside to the home of the container
-
+      # mount the named volume with the home directory inside to the home of the container
+      - home-dir:/home:rw 
 ```
-
-
 
 ##### Neovim setup
 
