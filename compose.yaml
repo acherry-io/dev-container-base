@@ -1,0 +1,23 @@
+services:
+  create-home-dir:
+    container_name: create-home-dir
+    image: docker.io/busybox
+    command: /usr/local/bin/build_home_dir.sh
+    volumes:
+      - home-dir:/home:rw
+      - /Users/${USER}:/home/.host/${USER}:ro
+      - ./build_home_dir.sh:/usr/local/bin/build_home_dir.sh:ro
+    restart: no
+     
+  dev-container:
+    container_name: #dev container name
+    image: # dev container image
+    ports:    
+      - "9000:22"
+    extra_hosts:
+      - "host.docker.internal:host.gateway"
+    volumes:
+      - home-dir:/home:rw
+
+volumes:
+  home-dir:
