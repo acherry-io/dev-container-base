@@ -4,6 +4,7 @@ ARG USER
 ARG UID
 ARG GROUP
 ARG GID
+ARG DEV_CONTAINER_BASE_DIR
 
 USER root
 
@@ -56,7 +57,7 @@ RUN echo "$USER:$(head -c 40 /dev/urandom | base64)" | chpasswd
 RUN mkdir -p /var/run/sshd
 
 # Configure sshd
-COPY sshd_config /etc/ssh/sshd_config
+COPY ${DEV_CONTAINER_BASE_DIR}/sshd_config /etc/ssh/sshd_config
 
 # Generate all missing default SSH host keys for fresh install
 ssh-keygen -A

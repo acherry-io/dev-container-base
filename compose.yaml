@@ -7,7 +7,7 @@ services:
     volumes:
       - home-dir:/home:rw
       - /Users/${USER}:/home/.host/${USER}:ro
-      - ./build_home_dir.sh:/usr/local/bin/build_home_dir.sh:ro
+      - ${DEV_CONTAINER_BASE_DIR}/build_home_dir.sh:/usr/local/bin/build_home_dir.sh:ro
     restart: no
      
   dev-container:

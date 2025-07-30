@@ -24,6 +24,7 @@ To create a foundation to easily spin up a development environment that I can in
 - **UID** - uid of logged in user
 - **GROUP** - group name of user
 - **GID** - group id of user
+- **DEV_CONTAINER_BASE_DIR** - base directory to resolve base scripts and files. I use a symlink to the base directory in the project root and set it to that link name.
 
 Uses Ubuntu as a base to create an image that will represent our development environment. An OpenSSH server is installed and configured as the route to access the development environment. zsh shell, Neovim, curl, and git are installed as assumed base offerings of the image. When the container is started, sshd is the foreground process that will keep the container alive.
 
@@ -32,6 +33,10 @@ The dev user is created with passed in uid and gid which will become relevant in
 ### compose.yaml
 
 To start the environment there are two services:
+
+#### Environment Variables
+
+- **DEV_CONTAINER_BASE_DIR** - base directory to resolve base scripts and files. I use a symlink to the base directory in the project root and set it to that link name.
 
 #### create-home-dir
 
