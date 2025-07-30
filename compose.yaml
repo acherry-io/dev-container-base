@@ -19,6 +19,8 @@ services:
       - "host.docker.internal:host.gateway"
     volumes:
       - home-dir:/home:rw
+    depends_on:
+      - create-home-dir
 
 volumes:
   home-dir:

@@ -21,6 +21,10 @@ RUN apt-get install -y zsh
 RUN apt-get install -y curl
 RUN apt-get install -y git
 
+# Install nvim tools
+RUN apt-get install -y ripgrep
+RUN apt-get install -y tree-sitter
+
 RUN apt-get clean
 
 # Get latest version tag and download URL
