@@ -1,3 +1,4 @@
+name: # project name
 services:
   create-home-dir:
     container_name: create-home-dir
