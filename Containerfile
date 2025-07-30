@@ -1,10 +1,8 @@
 FROM ubuntu:24.04
 
-ARG USER
-ARG UID
-ARG GROUP
-ARG GID
-ARG DEV_CONTAINER_BASE_DIR
+ARG USERNAME
+ARG USER_UID
+ARG USER_GID
 
 USER root
 
@@ -27,7 +25,7 @@ RUN apt-get install -y git
 
 # Install nvim tools
 RUN apt-get install -y ripgrep
-RUN apt-get install -y tree-sitter
+RUN apt-get install -y libtree-sitter-dev
 
 RUN apt-get clean
 
@@ -48,21 +46,25 @@ RUN echo "Getting neovim" && \
 
 
 # Add user for ssh access
-RUN groupadd -g $GID $GROUP
-RUN useradd -m -s /bin/zsh -u $UID -g $UNAME $USER
-RUN echo "$USER:$(head -c 40 /dev/urandom | base64)" | chpasswd
-
+RUN groupadd -g $USER_GID $USERNAME
+RUN useradd -m -s /bin/zsh -u $USER_UID -g $USER_GID $USERNAME
+RUN echo "$USERNAME:$(head -c 40 /dev/urandom | base64)" | chpasswd
 
 # If this directory doesn't exist, sshd will not work
 RUN mkdir -p /var/run/sshd
 
 # Configure sshd
-COPY ${DEV_CONTAINER_BASE_DIR}/sshd_config /etc/ssh/sshd_config
+COPY ./sshd_config /etc/ssh/sshd_config
 
 # Generate all missing default SSH host keys for fresh install
-ssh-keygen -A
+RUN ssh-keygen -A
 
 EXPOSE 22
+
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/sbin/sshd", "-D"]
 

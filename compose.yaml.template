@@ -5,22 +5,22 @@ services:
     image: docker.io/busybox
     command: /usr/local/bin/build_home_dir.sh
     volumes:
-      - home-dir:/home:rw
-      - /Users/${USER}:/home/.host/${USER}:ro
+      - ./.home:/home
+      - /Users/${USERNAME}:/home/.host/${USERNAME}:ro
       - ${DEV_CONTAINER_BASE_DIR}/build_home_dir.sh:/usr/local/bin/build_home_dir.sh:ro
     restart: no
      
   dev-container:
-    container_name: #dev container name
+    container_name: dev-container
     image: # dev container image
+    userns_node: "keep-id:uid=${USER_UID},gid=${USER_GID}"
     ports:    
       - "9000:22"
     extra_hosts:
       - "host.docker.internal:host.gateway"
     volumes:
-      - home-dir:/home:rw
+      - ./home:/home
+      - # mount source
     depends_on:
       - create-home-dir
 
-volumes:
-  home-dir:
