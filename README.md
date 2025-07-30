@@ -20,11 +20,14 @@ To create a foundation to easily spin up a development environment that I can in
 
 #### Arguments
 
-**USER** - user that is logged in on the host
+- **USER** - user that is logged in on the host
+- **UID** - uid of logged in user
+- **GROUP** - group name of user
+- **GID** - group id of user
 
 Uses Ubuntu as a base to create an image that will represent our development environment. An OpenSSH server is installed and configured as the route to access the development environment. zsh shell, Neovim, curl, and git are installed as assumed base offerings of the image. When the container is started, sshd is the foreground process that will keep the container alive.
 
-The dev user is created with uid and gid of 9999 which will become relevant in the compose.yaml file. The **USER** passed in will be the name used for the create account and the home directory
+The dev user is created with passed in uid and gid which will become relevant in the compose.yaml file. The **USER** passed in will be the name used for the create account and the home directory
 
 ### compose.yaml
 
@@ -43,7 +46,7 @@ This service syncs the home directory from the host to the home directory that w
 
 > [!IMPORTANT]
 >
-> The home directory needs to be stored in a named mount when using Podman because this allows us to set the uid and gid of the created home directory (with `chown`) to allow the created user in the dev container (uid 9999: gid 9999) to have read/write access to this folder.
+> The home directory needs to be stored in a named mount when using Podman because this allows us to set the same uid and gid of the created use to the home directory (with `chown`) allowing for full read/write access to this folder.
 
 A couple an highlights for how this is setup:
 

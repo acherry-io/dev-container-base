@@ -1,6 +1,9 @@
 FROM ubuntu:24.04
 
 ARG USER
+ARG UID
+ARG GROUP
+ARG GID
 
 USER root
 
@@ -44,8 +47,8 @@ RUN echo "Getting neovim" && \
 
 
 # Add user for ssh access
-RUN groupadd -g 9999 $USER
-RUN useradd -m -s /bin/zsh -u 9999 -g 9999 $USER
+RUN groupadd -g $GID $GROUP
+RUN useradd -m -s /bin/zsh -u $UID -g $UNAME $USER
 RUN echo "$USER:$(head -c 40 /dev/urandom | base64)" | chpasswd
 
 

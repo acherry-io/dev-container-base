@@ -90,5 +90,5 @@ cp /home/.host/$USER/.zshrc_shared /home/$USER/
 
 ### Setting owner to USER
 echo "Setting owner to $USER"
-chown -R 9999:9999 /home/$USER
+chown -R $(id -u):$(id -g) /home/$USER
 
