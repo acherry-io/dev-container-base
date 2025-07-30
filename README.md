@@ -51,9 +51,9 @@ A couple an highlights for how this is setup:
 
 * **GITHUB_SSH_ID_FILE** private key is copied to the .ssh directory. A record in the ssh config is added to use this file for access.
 
-  > [!NOTE]
-  >
-  > The config is set up with AddKeysToAgent = yes. This is to allow Neovim to be able to install plugins over an authenicated connection.
+> [!NOTE]
+>
+> The config is set up with AddKeysToAgent = yes. This is to allow Neovim to be able to install plugins over an authenicated connection.
 
 * On first load Oh My Zsh is installed and the .zshrc file is appended to
 
