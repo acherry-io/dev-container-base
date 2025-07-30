@@ -64,3 +64,5 @@ ssh-keygen -A
 EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]
+
+#### END BASE Containerfile
