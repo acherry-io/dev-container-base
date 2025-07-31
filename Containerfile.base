@@ -19,13 +19,15 @@ RUN apt-get install -y openssh-server
 # Install shell for user
 RUN apt-get install -y zsh
 
-# Install core tools
+# Install core libraries and nvim dependencies
+RUN apt-get install -y build-essential
 RUN apt-get install -y curl
+RUN apt-get install -y fd-find
 RUN apt-get install -y git
-
-# Install nvim tools
+RUN apt-get install -y libreadline-dev
 RUN apt-get install -y ripgrep
-RUN apt-get install -y libtree-sitter-dev
+RUN apt-get install -y unzip
+
 
 RUN apt-get clean
 
