@@ -19,18 +19,6 @@ RUN apt-get install -y openssh-server
 # Install shell for user
 RUN apt-get install -y zsh
 
-# Install core libraries and nvim dependencies
-RUN apt-get install -y build-essential
-RUN apt-get install -y curl
-RUN apt-get install -y fd-find
-RUN apt-get install -y git
-RUN apt-get install -y libreadline-dev
-RUN apt-get install -y ripgrep
-RUN apt-get install -y unzip
-
-
-RUN apt-get clean
-
 # Get latest version tag and download URL
 RUN echo "Getting neovim" && \
   api_url="https://api.github.com/repos/neovim/neovim/releases/latest" && \
@@ -69,5 +57,20 @@ RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/sbin/sshd", "-D"]
+
+# Install core libraries and nvim dependencies
+RUN apt-get install -y build-essential
+RUN apt-get install -y curl
+RUN apt-get install -y fd-find
+RUN apt-get install -y git
+RUN apt-get install -y libreadline-dev
+RUN apt-get install -y nodejs npm
+RUN apt-get install -y ripgrep
+RUN apt-get install -y unzip
+
+RUN npm install -g tree-sitter-cli
+RUN npm install -g neovim
+
+RUN apt-get clean
 
 #### END BASE Containerfile
