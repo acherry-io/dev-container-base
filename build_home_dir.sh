@@ -5,17 +5,27 @@ if [ -z "$USERNAME" ] ; then
   exit 1
 fi
 
+if [ -z "$USER_UID" ] ; then
+  echo "\$USER_UID is not set"
+  exit 2
+fi
+
+if [ -z "$USER_GID" ] ; then
+  echo "\$USER_GID is not set"
+  exit 3
+fi
+
 if [ -z "$LOCAL_SSH_ID_FILE" ] ; then
   echo "\$LOCAL_SSH_ID_FILE is not set"
-  exit 3
+  exit 4
 fi
 
 if [ -z "$GITHUB_SSH_ID_FILE" ] ; then
   echo "\$GITHUB_SSH_ID_FILE is not set"
-  exit 4
+  exit 5
 fi
 
-echo "USERNAME: $USERNAME"
+echo "USeRNAME: $USERNAME"
 echo "LOCAL SSH ID FILE: $LOCAL_SSH_ID_FILE"
 echo "GITHUB SSH ID FILE: $GITHUB_SSH_ID_FILE"
 
@@ -92,5 +102,8 @@ EOF
 fi
 
 cp /home/.host/$USERNAME/.zshrc_shared /home/$USERNAME/
+
+
+chown -R $USER_UID:$USER_GID /home/$USERNAME
 
 

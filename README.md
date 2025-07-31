@@ -2,7 +2,7 @@
 
 ## Purpose
 
-To create a foundation to easily spin up a development environment that I can install libraries, packages, etc. in to that will not pollute the host machine and also keep dependencies separate between projects. Using Podman in a rootless environment.
+To create a foundation to easily spin up a development environment that I can install libraries, packages, etc. in to that will not pollute the host machine and also keep dependencies separate between projects. Implemented in Podman using a root (not rootless) machine.
 
 ## Host Dependencies
 
@@ -14,6 +14,10 @@ To create a foundation to easily spin up a development environment that I can in
 
 * ssh keys to use for access to this container and ssh keys to use for access to GitHub
 
+> [!IMPORTANT]
+>
+> I originally wanted to do this with a rootless machine, however when logging in as a non-root user I could not get the bind mounts to be writable by that user. Using a root machine allows for control over ownership when running which makes it easier to sync between the host and the container.
+
 ## Implementation
 
 ### Containerfile
@@ -22,10 +26,11 @@ To create a foundation to easily spin up a development environment that I can in
 
 - **USERNAME** - user that is logged in on the host
 - **USER_UID** - uid of logged in user
+- **USER_GID** - gid to use to create group inside of image for user
 
-Uses Ubuntu as a base to create an image that will represent our development environment. An OpenSSH server is installed and configured as the route to access the development environment. zsh shell, Neovim, curl, and git are installed as assumed base offerings of the image. When the container is started, sshd is the foreground process that will keep the container alive.
+Uses a Debian as a base to create an image that will represent our development environment. An OpenSSH server is installed and configured as the route to access the development environment. A handful of packages are installed as a base offerings of the image. When the container is started, sshd is the foreground process that will keep the container alive.
 
-The dev user is created with passed in uid which will become relevant in the compose.yaml file. The **USER** passed in will be the name used for the create account and the home directory
+The dev user is created with passed in **USER_UID** and assigned a new group with the passed in **USER_GID** which will become relevant when building the home directory for the container. The **USER** passed in will be the name used for the create account and the home directory
 
 ### compose.yaml
 
@@ -35,7 +40,7 @@ To start the environment there are two services:
 
 - **USERNAME** - user that is logged in on the host
 - **USER_UID** - uid of user logged in on the host
-- **USER_GID** - gid for group assigned to the .home and source directory on the host
+- **USER_GID** - gid to assign to the home directory in the container.
 - **DEV_CONTAINER_BASE_DIR** - base directory to resolve base scripts and files.
 - **LOCAL_SSH_ID_FILE** - name. of the ssh id file that will be used to access from the host to the container
 - **GITHUB_SSH_ID_FILE** - name of the ssh id file that will be used to access GitHub
@@ -43,11 +48,7 @@ To start the environment there are two services:
 #### create-home-dir
 
 ##### build_home_dir.sh
-This service syncs the home directory from the host to the home directory that will be used on the main dev container. 
-
-> [!IMPORTANT]
->
-> The home directory on the host needs to be set to the same uid:gid that is passed in via the environment variables..
+This service syncs the home directory from the host to the home directory that will be used on the main dev container. At the end of the creation, home directory is chown'ed to **USER_UID**:**USER_GID**.
 
 > [!NOTE]
 >
@@ -60,6 +61,8 @@ This service syncs the home directory from the host to the home directory that w
     * All calls to https://github.com are routed to ssh:git@github.com
     * On login to the container, we test the connection to github.com to store our passkey in the running ssh-agent. If the challenge is displayed to Neovim for plugin install, this causes an error to be thrown.
 
+
+
 #### dev-container
 
 In the compose.yaml itself, at a minimum we'd expect to see the follow for the dev-container service:
@@ -67,8 +70,6 @@ In the compose.yaml itself, at a minimum we'd expect to see the follow for the d
 ```dockerfile
 dev-container:
   image: # dev container image
-  userns_node: "keep-id:uid=${USER_UID},gid=${USER_GID}" # This will allow us to log in as a user, but still be able to 
-  																											# read/write to .home and the source directory
     ports:    
       - "9000:22"
     extra_hosts:
@@ -79,10 +80,6 @@ dev-container:
     depends_on:
       - create-home-dir
 ```
-
-##### entrypoint.sh
-
-The entry point script chown the home directory of **USERNAME** to **USER_UID**:**USER_GID** on every load. This ensures we'll be able to read and write to directories in the home directory without running as root!
 
 ### Neovim setup
 
