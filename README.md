@@ -43,7 +43,6 @@ To start the environment there are two services:
 - **USER_GID** - gid to assign to the home directory in the container.
 - **DEV_CONTAINER_BASE_DIR** - base directory to resolve base scripts and files.
 - **LOCAL_SSH_ID_FILE** - name. of the ssh id file that will be used to access from the host to the container
-- **GITHUB_SSH_ID_FILE** - name of the ssh id file that will be used to access GitHub
 
 #### create-home-dir
 
@@ -59,9 +58,6 @@ This service syncs the home directory from the host to the home directory that w
   * A copy of ~/.zshrc_shared is placed in the home volume and is added to be sourced on load of zsh
   * Items for GitHub are hardcoded into the .zshrc file
     * All calls to https://github.com are routed to ssh:git@github.com
-    * On login to the container, we test the connection to github.com to store our passkey in the running ssh-agent. If the challenge is displayed to Neovim for plugin install, this causes an error to be thrown.
-
-
 
 #### dev-container
 

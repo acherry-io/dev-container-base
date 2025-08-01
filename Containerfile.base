@@ -65,7 +65,7 @@ RUN ssh-keygen -A
 
 EXPOSE 22
 
-CMD ["sudo", "/usr/sbin/sshd", "-D"]
+CMD ["/usr/sbin/sshd", "-D"]
 
 # Install core dev and nvim dependencies
 RUN apt-get install -y fd-find

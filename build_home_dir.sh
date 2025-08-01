@@ -20,14 +20,8 @@ if [ -z "$LOCAL_SSH_ID_FILE" ] ; then
   exit 4
 fi
 
-if [ -z "$GITHUB_SSH_ID_FILE" ] ; then
-  echo "\$GITHUB_SSH_ID_FILE is not set"
-  exit 5
-fi
-
-echo "USeRNAME: $USERNAME"
+echo "USERNAME: $USERNAME"
 echo "LOCAL SSH ID FILE: $LOCAL_SSH_ID_FILE"
-echo "GITHUB SSH ID FILE: $GITHUB_SSH_ID_FILE"
 
 ### Create home dir
 if [ ! -d /home/$USERNAME ]; then
@@ -51,15 +45,6 @@ fi
 touch /home/$USERNAME/.ssh/authorized_keys
 cat /home/.host/$USERNAME/.ssh/$LOCAL_SSH_ID_FILE.pub > /home/$USERNAME/.ssh/authorized_keys
 
-# Add private key for github
-cp /home/.host/$USERNAME/.ssh/$GITHUB_SSH_ID_FILE /home/$USERNAME/.ssh/
-chmod 600 /home/$USERNAME/.ssh/$GITHUB_SSH_ID_FILE
-
-cat > /home/$USERNAME/.ssh/config <<EOF
-Host github.com
-  IdentityFile ~/.ssh/$GITHUB_SSH_ID_FILE 
-  AddKeysToAgent yes
-EOF
 
 ### nvim setup
 echo "Setting up nvim"
@@ -85,14 +70,9 @@ sh -c "\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/to
 
 
 cat >> /home/$USERNAME/.zshrc <<EOS
-
 source /home/$USERNAME/.zshrc_shared
 
 git config --global url."git@github.com:".insteadOf "https://github.com/"
-
-# Add passphrase to ssh-agent for github for session or else nvim syncs will fail
-echo "Testing github connection..."
-ssh -T git@github.com
 
 EOS
 
