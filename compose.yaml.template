@@ -1,26 +1,16 @@
 name: # project name
 services:
-  create-home-dir:
-    container_name: create-home-dir
-    image: docker.io/busybox
-    command: /usr/local/bin/build_home_dir.sh
-    volumes:
-      - ./.home:/home
-      - /Users/${USERNAME}:/home/.host/${USERNAME}:ro
-      - ${DEV_CONTAINER_BASE_DIR}/build_home_dir.sh:/usr/local/bin/build_home_dir.sh:ro
-    restart: no
-     
   dev-container:
     container_name: dev-container
     image: # dev container image
-    userns_node: "keep-id:uid=${USER_UID},gid=${USER_GID}"
     ports:    
       - "9000:22"
     extra_hosts:
       - "host.docker.internal:host.gateway"
     volumes:
-      - ./home:/home
+      - ./.home:/home
+      - # local public ssh key:/home/.host/${USERNAME}/ssh/local.pub
+      - # nvim config:/home/.host/nvim/.config/
+      - # zshrc_shared:/home/.host/zshrc/.zshrc_shared
       - # mount source
-    depends_on:
-      - create-home-dir
 

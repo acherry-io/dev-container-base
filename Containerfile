@@ -1,30 +1,18 @@
-#FROM ubuntu:24.04
 FROM debian:bookworm-slim
 
-
-ARG USERNAME
-ARG USER_UID
-ARG USER_GID
+LABEL maintainer=$USERNAME
+LABEL org.opencontainers.image.source="https://github.com/acherry-io/dev-container-base"
 
 USER root
 
-RUN apt-get update -y
-RUN apt-get install -y software-properties-common
-RUN apt-get update -y
-RUN apt-get upgrade -y
-
-RUN apt-get install -y --no-install-recommends
-
-# Install ssh server
-RUN apt-get install -y openssh-server
-
-# Install shell for user
-RUN apt-get install -y zsh
-
-# Install essential packages
-RUN apt-get install -y build-essential
-RUN apt-get install -y curl
-RUN apt-get install -y sudo
+# Install openssh, shell, and other core dev tools for user
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends && \
+    apt-get install -y openssh-server && \
+    apt-get install -y zsh && \
+    apt-get install -y build-essential && \
+    apt-get install -y curl
 
 
 # Get latest version tag and download URL
@@ -43,17 +31,6 @@ RUN echo "Getting neovim" && \
   ln -s /opt/nvim/$latest_tag/bin/nvim /usr/bin/nvim
 
 
-# Add user for ssh access
-RUN groupadd -g $USER_GID $USERNAME
-RUN useradd -m -s /bin/zsh -u $USER_UID -g $USER_GID $USERNAME
-RUN echo "$USERNAME:$(head -c 40 /dev/urandom | base64)" | chpasswd
-
-# Add to sudoers
-RUN usermod -aG sudo $USERNAME
-
-# Set up passwordless sudo
-RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
 # If this directory doesn't exist, sshd will not work
 RUN mkdir -p /var/run/sshd
 
@@ -65,6 +42,11 @@ RUN ssh-keygen -A
 
 EXPOSE 22
 
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod 544 /entrypoint.sh
+
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/sbin/sshd", "-D"]
 
 # Install core dev and nvim dependencies
@@ -81,4 +63,3 @@ RUN npm install -g neovim
 
 RUN apt-get clean
 
-#### END BASE Containerfile
