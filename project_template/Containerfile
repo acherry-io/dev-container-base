@@ -1,0 +1,2 @@
+FROM ${HOST}/dev-container-base:latest
+

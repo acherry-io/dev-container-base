@@ -1,0 +1,22 @@
+name: # project name
+  services:
+  dev-container:
+    container_name: dev-container
+    image: # ${HOST}/image:latest
+    env_file:
+      - .env
+    ports:    
+      - "9000:22"
+    extra_hosts:
+      - "host.docker.internal:host.gateway"
+    volumes:
+      - ./.home:/home
+      - /Users/${USERNAME}/.ssh/${LOCALHOST_SSH_ID}.pub:/home/.host/${USERNAME}/ssh/local.pub
+      - /Users/${USERNAME}/.config/nvim/:/home/.host/${USERNAME}/nvim/.config/
+      - /Users/${USERNAME}/.zshrc_shared:/home/.host/${USERNAME}/zshrc/.zshrc_shared
+      - ../:/home/${USERNAME}/project
+      - empty:/home/${USERNAME}/project/container
+
+volumes:
+  empty:
+    external: true
