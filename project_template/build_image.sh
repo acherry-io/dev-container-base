@@ -7,6 +7,7 @@ echo $version
 echo $project_dir
 
 podman build \
+  --build-arg HOST=$HOST:
   --tag $HOST/$project_dir:$version \
   --tag $HOST/$project_dir:latest \
   -f ./Containerfile
