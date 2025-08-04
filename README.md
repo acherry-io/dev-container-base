@@ -61,7 +61,7 @@ dev-container:
     env_file:
     	- .env
     ports:    
-      - "9000:22"
+      - "0:22"
     volumes:
       - {location to store home on host}:/home
 			- {local public ssh key to be added to authorization keys}:/home/.host/${USERNAME}/ssh/local.pub
@@ -72,9 +72,17 @@ dev-container:
       - create-home-dir
 ```
 
-### Neovim setup
+### Environment setup
 
-> [!WARNING]
+#### Source Code
+
+I place a copy of the project_template into my project folders which means where I store my container's home directory is in that tree. At the moment, I create an "empty" volume and bind it to make the container folder look empty in my project on the container.
+
+#### Neovim
+
+If there is custom Neovim logic to run, place a ".nvim.lua" file in the root of the home directory and add it to your init.lua to be picked up on launch.
+
+> [!NOTE]
 >
 > I made the decision to have all calls to GitHub be over an authenticated connection. Reviewing the [rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api) of GitHub, an authenticated connection can do far more than an unauthenticated one. I'm not sure if this applies to clones/fetches, but I did it just in case.
 >
@@ -94,3 +102,59 @@ dev-container:
 >   }
 > ```
 
+#### ssh
+
+In my host's .zshrc file, I have this following `ssh-dev` command which I run to connect to my containers. It assumes you call it within a project folder, but it locates the root (looking for a .git folder) and then pulls the randomly assigned port number to pass to ssh.
+
+````sh
+# ssh to dev container, must be called inside 
+function ssh-dev() {
+  local dir="$PWD"
+  while [ "$dir" != "/" ] ; do
+    if [ -d "$dir/.git" ] ; then
+      break;
+    fi
+    dir=$(dirname "$dir")
+  done
+
+  if [ "$dir" = "/" ] ; then
+    echo "Could not find .git"
+    return 1
+  fi
+
+  # first line of compose.yaml is the project name
+  if ! read project_name < $dir/container/compose.yaml; then
+    echo "Cannot read compose.yaml"
+    return 2
+  fi
+
+  # Remove "name: ", double quotes, and spaces
+  project_name=$(echo "$project_name" | sed 's/name://' | sed 's/"//' | sed 's/[[:space:]]//')
+
+  #local project_name=$(basename $dir)
+  local port=$(podman inspect --format='{{(index (index .NetworkSettings.Ports "22/tcp") 0).HostPort}}' "$project_name-dev-container")
+  
+  ssh -p $port dev-container
+}
+
+
+````
+
+In my ~/.ssh/config file I set up the following config to complement the call: 
+
+````
+Host dev-container
+  HostName localhost
+  User [USERNAME]
+  IdentityFile ~/.ssh/[ID FILE]
+  IdentitiesOnly yes
+  ForwardAgent yes
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking accept-new
+````
+
+
+
+#### zsh
+
+Similar to Neovim, place a ".zshrc_local" file in the root of the home directory and add it to your .zshrc_shared to be picked up on launch
