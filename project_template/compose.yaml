@@ -12,8 +12,8 @@ services:
     volumes:
       - ./.home:/home
       - /Users/${USERNAME}/.ssh/${LOCALHOST_SSH_ID}.pub:/home/.host/${USERNAME}/ssh/local.pub
-      - /Users/${USERNAME}/.config/nvim/:/home/.host/${USERNAME}/nvim/.config/
-      - /Users/${USERNAME}/.zshrc_shared:/home/.host/${USERNAME}/zshrc/.zshrc_shared
+      - ${DOTFILES_ROOT}/.config/nvim/:/home/.host/${USERNAME}/nvim/.config/
+      - ${DOTFILES_ROOT}/.zshrc_shared:/home/.host/${USERNAME}/zshrc/.zshrc_shared
       - ./.zshrc_local:/home/${USERNAME}/.zshrc_local
       - ./.nvim.lua:/home/${USERNAME}/.nvim.lua
       - ../:/home/${USERNAME}/project
